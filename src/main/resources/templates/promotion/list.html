@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<title>促销信息</title>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="referrer" content="no-referrer" />
+    <!-- 引入 Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <!--[if lt IE 9]>
+    <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <![endif]-->
+    <!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- 包括所有已编译的插件 -->
+    <script src="js/bootstrap.min.js"></script>
+    <style>
+        label a {
+            width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+<ul class="pagination">
+    <li><a th:href="@{'/promotion/list?pageNum='+${pre}}">&laquo;</a></li>
+    <span th:each="i:${#numbers.sequence(start, end)}" th:remove="tag">
+         <li th:class="${i}==${pageNum}?'active':''">
+             <a th:href="@{'/promotion/list?pageNum='+${i}}">
+                 <span th:text="${i}"></span>
+             </a>
+         </li>
+    </span>
+    <li><a th:href="@{'/promotion/list?pageNum='+${next}}">&raquo;</a></li>
+</ul>
+<div th:each="promotion,stat:${list}">
+    <div class="panel panel-default" th:object="${promotion}">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span th:text="*{['title']}"></span>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <label th:utext="*{['content']}"></label><br/>
+            <label th:text="*{['createtime']}"></label>
+        </div>
+    </div>
+    <!--
+    <td th:text="*{title}"></td>
+    <td th:text="*{content}"></td>
+    <td th:object="${promotion['scourse']}">
+        <span th:text="*{['cscore']}"></span>
+    </td>
+    -->
+</div>
+</body>
+</html>

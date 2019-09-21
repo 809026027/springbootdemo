@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<title>高淳大闸蟹</title>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="referrer" content="no-referrer" />
+    <!-- 引入 Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/jquery.bootstrapvalidator/0.5.2/css/bootstrapValidator.min.css"/>
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script src="/static/scripts/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.bootstrapvalidator/0.5.2/js/bootstrapValidator.min.js"></script>
+    <script type="text/javascript">
+        $().ready(function() {
+            $("#calculate").click(function () {
+                $("#resultBody tr").each(function () {
+                    var keys = $(this).attr("id").split("-");
+                    var mPrice = $("#" + keys[0]).val();
+                    var mWeight = keys[0].substring(1);
+                    var fPrice = $("#" + keys[1]).val();
+                    var fWeight = keys[1].substring(1);
+                    var result = parseFloat((Number(mPrice) * Number(mWeight) / 100) * 100 + (Number(fPrice) * Number(fWeight) / 100) * 100);
+                    var tds = $(this).find("td");
+                    tds.eq(1).html(Math.floor(result * 4) / 100);
+                    tds.eq(2).html(Math.floor(result * 5) / 100);
+                });
+            });
+        });
+    </script>
+    <style>
+        #price th{
+            padding: 4px !important;
+        }
+        #price td{
+            padding: 4px !important;
+        }
+        #result th{
+            padding: 6px !important;
+        }
+        #result td{
+            padding: 6px !important;
+        }
+    </style>
+</head>
+<body>
+    <table id="price" class="table table-striped">
+        <!--<caption>高淳大闸蟹</caption>-->
+        <thead>
+        <tr>
+            <th style="width:14%;">种类</th>
+            <th style="width:18%">规格</th>
+            <th style="width:25%;">单价</th>
+            <th style="width:18%">规格</th>
+            <th style="width:25%;">单价</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="table-hover">
+            <td rowspan="3" style="display:table-cell; vertical-align:middle">公蟹</td>
+            <td>5.0公</td>
+            <td><input class="form-control input-sm" id="m50" type="text" maxlength="6" value="150" /></td>
+            <td>4.5公</td>
+            <td><input class="form-control input-sm" id="m45" type="text" maxlength="6" value="120" /></td>
+        </tr>
+        <tr>
+            <td>4.0公</td>
+            <td><input class="form-control input-sm" id="m40" type="text" maxlength="6" value="100" /></td>
+            <td>3.5公</td>
+            <td><input class="form-control input-sm" id="m35" type="text" maxlength="6" value="75" /></td>
+        </tr>
+        <tr>
+            <td>3.0公</td>
+            <td><input class="form-control input-sm" id="m30" type="text" maxlength="6" value="50" /></td>
+            <td>2.5公</td>
+            <td><input class="form-control input-sm" id="m25" type="text" maxlength="6" value="35" /></td>
+        </tr>
+        <tr>
+            <td rowspan="3" style="display:table-cell; vertical-align:middle">母蟹</td>
+            <td>4.0母</td>
+            <td><input class="form-control input-sm" id="f40" type="text" maxlength="6" value="200" /></td>
+            <td>3.5母</td>
+            <td><input class="form-control input-sm" id="f35" type="text" maxlength="6" value="160" /></td>
+        </tr>
+        <tr>
+            <td>3.0母</td>
+            <td><input class="form-control input-sm" id="f30" type="text" maxlength="6" value="135" /></td>
+            <td>2.8母</td>
+            <td><input class="form-control input-sm" id="f28" type="text" maxlength="6" value="105" /></td>
+        </tr>
+        <tr>
+            <td>2.5母</td>
+            <td><input class="form-control input-sm" id="f25" type="text" maxlength="6" value="80" /></td>
+            <td>2.0母</td>
+            <td><input class="form-control input-sm" id="f20" type="text" maxlength="6" value="55" /></td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="padding-left: 10px"><button type="button" id="calculate" class="btn btn-success btn-sm">计算</button></div>
+    <table id="result" class="table table-striped">
+        <thead>
+            <tr>
+                <th style="width:40%;">组合</th>
+                <th style="width:20%">8只</th>
+                <th style="width:20%">10只</th>
+            </tr>
+        </thead>
+        <tbody id="resultBody">
+            <tr id="f20-m30">
+                <td>2两母蟹 3两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="f25-m30">
+                <td>2.5两母蟹 3两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="f25-m35">
+                <td>2.5两母蟹 3.5两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="f28-m35">
+                <td>2.8两母蟹 3.5两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="f28-m40">
+                <td>2.8两母蟹 4两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="f30-m40">
+                <td>3两母蟹 4两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="f30-m45">
+                <td>3两母蟹 4.5两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="f35-m45">
+                <td>3.5两母蟹 4.5两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="f35-m50">
+                <td>3.5两母蟹 5两公蟹</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

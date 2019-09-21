@@ -1,0 +1,165 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<title>websocket集群</title>
+<head>
+    <meta charset="utf-8"></meta>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="referrer" content="no-referrer" />
+    <!-- 引入 Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/jquery.bootstrapvalidator/0.5.2/css/bootstrapValidator.min.css"/>
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script src="/static/scripts/jsencrypt.js"></script>
+    <script src="/static/scripts/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<input type="hidden" id="ip" th:value="${ip}"></input>
+<input type="hidden" id="port" th:value="${port}"></input>
+<input type="hidden" id="topic" th:value="${topic}"></input>
+<input type="hidden" id="myname" th:value="${myname}"></input>
+<!-- 模态框（Modal） -->
+<div class="modal fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: block">
+    <div class="modal-dialog" style="width: 350px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <!--
+                        本服务端口号：<span th:text="${port}"></span>，使用redismq实现websocket集群<br/>
+                    -->
+                    <span th:text="${topic}"></span> 频道 聊天中。。。<br/>
+                </h4>
+            </div>
+            <div class="modal-body" id="message_id" style=" height:350px;overflow: auto">
+
+            </div>
+            <div class="modal-footer">
+                <textarea class="form-control" id="input_id" maxlength="1000" type="text" placeholder="请输入消息" />
+                <button class="btn btn-default" onclick="sendMessage()">发送</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<textarea id="privkey" style="display: none" rows="15" cols="65">-----BEGIN RSA PRIVATE KEY-----
+MIICXQIBAAKBgQDlOJu6TyygqxfWT7eLtGDwajtNFOb9I5XRb6khyfD1Yt3YiCgQ
+WMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76xFxdU6jE0NQ+Z+zEdhUTooNR
+aY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4gwQco1KRMDSmXSMkDwIDAQAB
+AoGAfY9LpnuWK5Bs50UVep5c93SJdUi82u7yMx4iHFMc/Z2hfenfYEzu+57fI4fv
+xTQ//5DbzRR/XKb8ulNv6+CHyPF31xk7YOBfkGI8qjLoq06V+FyBfDSwL8KbLyeH
+m7KUZnLNQbk8yGLzB3iYKkRHlmUanQGaNMIJziWOkN+N9dECQQD0ONYRNZeuM8zd
+8XJTSdcIX4a3gy3GGCJxOzv16XHxD03GW6UNLmfPwenKu+cdrQeaqEixrCejXdAF
+z/7+BSMpAkEA8EaSOeP5Xr3ZrbiKzi6TGMwHMvC7HdJxaBJbVRfApFrE0/mPwmP5
+rN7QwjrMY+0+AbXcm8mRQyQ1+IGEembsdwJBAN6az8Rv7QnD/YBvi52POIlRSSIM
+V7SwWvSK4WSMnGb1ZBbhgdg57DXaspcwHsFV7hByQ5BvMtIduHcT14ECfcECQATe
+aTgjFnqE/lQ22Rk0eGaYO80cc643BXVGafNfd9fcvwBMnk0iGX0XRsOozVt5Azil
+psLBYuApa66NcVHJpCECQQDTjI2AQhFc1yRnCU/YgDnSpJVm1nASoRUnU8Jfm3Oz
+uku7JUXcVpt08DFSceCEX9unCuMcT72rAQlLpdZir876
+-----END RSA PRIVATE KEY-----</textarea>
+<textarea id="pubkey" style="display: none" rows="15" cols="65">-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN
+FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76
+xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4
+gwQco1KRMDSmXSMkDwIDAQAB
+-----END PUBLIC KEY-----</textarea>
+</body>
+<script type="text/javascript">
+    document.getElementById('input_id').focus();
+    var websocket = null;
+    //当前浏览前是否支持websocket
+    if("WebSocket" in window){
+        //var ip = $("#ip").val();
+        //var port = $("#port").val();
+        var host = window.location.host;
+        var topic = $("#topic").val();
+        var myname = $("#myname").val();
+        var url = "ws://"+ host +"/websocket/"+topic+"/"+myname;
+        websocket = new WebSocket(url);
+    }else{
+        alert("浏览器不支持websocket");
+    }
+
+    websocket.onopen = function(event){
+        console.info("打开连接");
+    }
+
+    websocket.onclose = function(event){
+        console.info("关闭连接");
+    }
+
+    websocket.onmessage = function(event){
+        setMessage(event.data);
+    }
+
+    websocket.onerror = function(event){
+        console.info("连接异常");
+    }
+
+    //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+    window.onbeforeunload = function(){
+        closeWebsocket();
+    }
+
+    //关闭websocket
+    function closeWebsocket(){
+        //3代表已经关闭
+        if(3!=websocket.readyState){
+            websocket.close();
+        }else{
+            alert("websocket之前已经关闭");
+        }
+    }
+
+    //将消息显示在网页上
+    function setMessage(message){
+        // Decrypt with the private key...
+        var decrypt = new JSEncrypt();
+        decrypt.setPrivateKey($('#privkey').val());
+        var obj = eval('(' + message + ')');
+        obj.message = decrypt.decrypt(obj.message);
+        document.title = obj.myname + ":" +obj.message;
+        var myname = $("#myname").val();
+        var html =  '<p style="text-align: left; margin-right: 50px; background-color: aquamarine;border-radius:10px;"><span style="height: 100%;font-weight:bold">'+obj.myname + '</span>：<span  style="margin:2px">' + obj.message+'</span></p>';
+        if(myname == obj.myname){
+            html =  '<p style="text-align: right; margin-left: 50px; background-color: aquamarine;border-radius:10px;"><span style="margin:5px">'+obj.message+'</span></p>';
+        }
+        document.getElementById('message_id').innerHTML += html;
+    }
+
+    //发送消息
+    function sendMessage(){
+        //1代表正在连接
+        if(1==websocket.readyState){
+            var message = document.getElementById('input_id').value;
+            if($.trim(message) == ""){
+                return;
+            }
+            var encrypt = new JSEncrypt();
+            encrypt.setPublicKey($('#pubkey').val());
+            message = encrypt.encrypt($.trim(message));
+            websocket.send(message);
+        }else{
+            alert("websocket未连接");
+        }
+        document.getElementById('input_id').value="";
+        document.getElementById('input_id').focus();
+    }
+
+    $(document).keypress(function(e) {
+        if((e.keyCode || e.which)==13) {
+            // 触发需要调用的方法
+            sendMessage();
+        }
+    });
+</script>
+</html>

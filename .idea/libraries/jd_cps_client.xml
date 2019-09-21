@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jd-cps-client">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jd-cps-client.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

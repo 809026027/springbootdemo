@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<title>个人所得税</title>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="referrer" content="no-referrer" />
+    <!-- 引入 Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/jquery.bootstrapvalidator/0.5.2/css/bootstrapValidator.min.css"/>
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script src="/static/scripts/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.bootstrapvalidator/0.5.2/js/bootstrapValidator.min.js"></script>
+    <script type="text/javascript">
+        $().ready(function(){
+            $('form').bootstrapValidator({
+                // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    amt: {
+                        message: '税前工资必须是数字',
+                        validators: {
+                            stringLength: {
+                                max: 10,
+                                message: '最长支持10位数字'
+                            },
+                            regexp: {
+                                regexp: /^[1-9]+\d*(\.\d{0,2})?$|^0?\.\d{0,2}$/,
+                                message: '正整数且最长支持两位小数'
+                            }
+                        }
+                    },
+                    gjjAmt: {
+                        message: '公积金必须是数字',
+                        validators: {
+                            stringLength: {
+                                max: 10,
+                                message: '最长支持10位数字'
+                            },
+                            regexp: {
+                                regexp: /^[1-9]+\d*(\.\d{0,2})?$|^0?\.\d{0,2}$/,
+                                message: '正整数且最长支持两位小数'
+                            }
+                        }
+                    },
+                    sbAmt: {
+                        message: '社保必须是数字',
+                        validators: {
+                            stringLength: {
+                                max: 10,
+                                message: '最长支持10位数字'
+                            },
+                            regexp: {
+                                regexp: /^[1-9]+\d*(\.\d{0,2})?$|^0?\.\d{0,2}$/,
+                                message: '正整数且最长支持两位小数'
+                            }
+                        }
+                    },
+                    fjAmt: {
+                        message: '附件免税额必须是数字',
+                        validators: {
+                            stringLength: {
+                                max: 7,
+                                message: '最长支持7位数字'
+                            },
+                            regexp: {
+                                regexp: /^[1-9]+\d*(\.\d{0,2})?$|^0?\.\d{0,2}$/,
+                                message: '正整数且最长支持两位小数'
+                            }
+                        }
+                    }
+                }
+            });
+
+            $("#queryTax").click(function(){
+                $.ajax({
+                    type: "post",
+                    data:$("form").serialize(),
+                    url: "/tax/query",
+                    dataType:"json",
+                    success:function (result) {
+                        var type = $("#type").val();
+                        var html = '<li class="list-group-item">应纳税额:' + result.nutAmt + '</li>';
+                        if(type == '1'){
+                            html += '<li class="list-group-item">月平均纳税额:' + result.taxAmt + ',实发工资:' + result.sjAmt + '</li>';
+                        }else {
+                            var index = 1;
+                            for(var i in result.list){
+                                html += '<li class="list-group-item">' + (index++) + '月纳税额:' + result.list[i].taxAmt + ',实发工资:' + result.list[i].sjAmt + '</li>';
+                            }
+                        }
+                        $("#data").html(html);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            个人所得税查询
+        </h3>
+    </div>
+    <div class="panel-body">
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label class="col-sm-1 control-label">税前工资</label>
+                <div class="col-sm-2 input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input class="form-control" id="amt" name="amt" type="text" maxlength="10" value="5000" placeholder="税前工资"/>
+                    <span class="input-group-addon">元</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">公积金基数</label>
+                <div class="col-sm-2 input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input class="form-control" id="gjjAmt" name="gjjAmt" type="text" maxlength="7" value="2020" placeholder="公积金基数"/>
+                    <span class="input-group-addon">元</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">公积金比例</label>
+                <div class="col-sm-2">
+                    <select class="form-control" id="gjjRate" name="gjjRate">
+                        <option value="0.05">5%</option>
+                        <option value="0.06">6%</option>
+                        <option value="0.07">7%</option>
+                        <option selected="selected" value="0.08">8%</option>
+                        <option value="0.09">9%</option>
+                        <option value="0.10">10%</option>
+                        <option value="0.11">11%</option>
+                        <option value="0.12">12%</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">社保基数</label>
+                <div class="col-sm-2 input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input class="form-control" id="sbAmt" name="sbAmt" type="text" maxlength="10" value="3368" placeholder="社保基数"/>
+                    <span class="input-group-addon">元</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">附加扣除金额</label>
+                <div class="col-sm-2 input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input class="form-control" id="fjAmt" name="fjAmt" type="text" maxlength="10" value="0" placeholder="附加扣除金额"/>
+                    <span class="input-group-addon">元</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-1 control-label">查询类型</label>
+                <div class="col-sm-2">
+                    <select class="form-control" id="type" name="type">
+                        <option value="1">月平均纳税</option>
+                        <option value="2">按月纳税</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-3">
+                        <button type="button" id="queryTax" class="btn btn-default">查询</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<ul class="list-group" id="data">
+</ul>
+
+</body>
+</html>
