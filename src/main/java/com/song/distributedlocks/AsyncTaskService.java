@@ -103,7 +103,7 @@ public class AsyncTaskService {
             // 2. 支持过期解锁功能,2秒钟以后自动解锁, 无需调用unlock方法手动解锁
             //lock.lock(2, TimeUnit.SECONDS);
             // 3. 尝试加锁，最多等待1秒，上锁以后10秒自动解锁
-            boolean bs = lock.tryLock(0, -1, TimeUnit.SECONDS);
+            boolean bs = lock.tryLock(0, 100, TimeUnit.SECONDS);
             if(!bs){
                 return new AsyncResult<String>("fail:" + i);// Future接收返回值，这里是String类型，可以指明其他类型
             }
@@ -115,8 +115,7 @@ public class AsyncTaskService {
             return new AsyncResult<String>("fail:" + i);// Future接收返回值，这里是String类型，可以指明其他类型
         }
         finally {
-            System.out.println("unlock" + i);
-            //主动解锁就会阻塞，去掉就非阻塞，原因不明，就是这么神奇
+            //lock.tryLock会阻塞自旋获取锁，若主动解锁，相当于阻塞锁，若不主动解锁，其他锁在第一个锁结束后获取失败，锁在超时后解锁
             //lock.unlock();
         }
     }
