@@ -4,9 +4,7 @@ import com.song.service.RedissonReactiveService;
 import com.song.service.RedissonService;
 import com.song.utils.CookieUtil;
 import com.song.utils.RedisUtil;
-import org.redisson.api.RFuture;
 import org.redisson.api.RLock;
-import org.redisson.api.RLockAsync;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -32,9 +29,6 @@ public class AsyncTaskService {
 
     @Autowired
     private RedissonService redissonService;
-
-    @Autowired
-    private RedissonReactiveService redissonReactiveService;
 
     @Autowired
     private DistributedLockByZookeeper distributedLockByZookeeper;
