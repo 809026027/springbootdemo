@@ -3,12 +3,52 @@
 <head>
     <meta charset="UTF-8"/>
     <script src="/static/scripts/jquery.min.js"></script>
-    <script src="/static/scripts/test.js"></script>
     <title>Title</title>
+    <script type="text/javascript">
+        $().ready(function() {
+            $("#addUser").click(function () {
+                var user = {};
+                user.name = $("#name").val();
+                user.password = $("#password").val();
+                user.version = $("#version").val();
+                $.ajax({
+                    type: "post",
+                    data: JSON.stringify(user),
+                    url: "/user/addObject",
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (result) {
+                        alert(result);
+                    }
+                });
+            });
+        });
+    </script>
 
 </head>
 <h1>TEST PAGE</h1>
 <body>
-
+<form class="form-horizontal" role="form">
+    <div class="form-group">
+        <label class="col-sm-1 control-label">用户名</label>
+        <div class="col-sm-2">
+            <input class="form-control" id="name" name="name" type="text" maxlength="10" value="" placeholder="用户名"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">密码</label>
+        <div class="col-sm-2">
+            <input class="form-control" id="password" name="password" type="text" maxlength="7" value="" placeholder="密码"/>
+            <input type="hidden" id="version" name="version" value="1"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-3">
+                <button type="button" id="addUser" class="btn btn-default">新增</button>
+            </div>
+        </div>
+    </div>
+</form>
 </body>
 </html>

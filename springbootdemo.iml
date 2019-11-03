@@ -378,6 +378,11 @@
     <orderEntry type="library" name="Maven: org.apache.ant:ant-launcher:1.9.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-configuration-processor:1.5.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.vaadin.external.google:android-json:0.0.20131108.vaadin1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-amqp:1.5.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.amqp:spring-rabbit:1.7.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.rabbitmq:http-client:1.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.amqp:spring-amqp:1.7.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.rabbitmq:amqp-client:4.0.1" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: com.feng:bcprov-jdk14-138:1.0">
         <CLASSES>

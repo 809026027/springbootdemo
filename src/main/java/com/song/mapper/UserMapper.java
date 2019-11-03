@@ -21,6 +21,10 @@ public interface UserMapper {
     @Insert("insert into tbl_user(name,password,version) values(#{name},#{password},#{version})")
     int addUser(@Param("name") String name, @Param("password") String password, @Param("version") String version);
 
+    @Insert("insert into tbl_user(name,password,version) values(#{name},#{password},#{version})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int addUserObject(User user);
+
     @Update("<script>update tbl_user set name = #{name},password = #{password},version=version+1 where id=#{id}" +
             "<when test='version!=null'>" +
             " and version = #{version} " +

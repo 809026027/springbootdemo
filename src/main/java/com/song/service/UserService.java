@@ -57,6 +57,14 @@ public class UserService {
         return userList;
     }
 
+    public int addUser(User user){
+        int result = 0;
+        try{
+            result = userMapper.addUserObject(user);
+        }catch (Exception e){}
+        return result;
+    }
+
     /**
      * 测试hibernate事务
      *

@@ -1,5 +1,6 @@
 package com.song.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.song.bloomfilter.BloomFilters;
 import com.song.entity.User;
 import com.song.service.UserService;
@@ -9,6 +10,7 @@ import com.song.utils.RedisUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -85,6 +87,18 @@ public class UserController {
     public String redis(@RequestParam(value = "key")String key,@RequestParam(value = "value")String value){
         redisUtil.set(key,value);
         return String.valueOf(redisUtil.get(key));
+    }
+
+    @RequestMapping(value = "/add")
+    @ResponseBody
+    public String addUser(@RequestBody String jsonString){
+        return userService.addUser(JSON.parseObject(jsonString,User.class)) + "";
+    }
+
+    @RequestMapping(value = "/addObject")
+    @ResponseBody
+    public String addUser(@RequestBody User user){
+        return userService.addUser(user) + "";
     }
 
 }
